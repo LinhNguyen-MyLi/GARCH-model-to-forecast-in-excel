@@ -1,6 +1,7 @@
-# GARCH-model-to-forecast-in-excel-
-I apply fundamental knowledge related to the GARCH model to make forecast the volatility of return of 10 big firms in the IT industry
-Build up GARCH (1,1) model using Maximum Likelihood to predict the volatility of return on stock prices of 10 firms. You could read the following steps to get more insight into forecasting with the GARCH model:
+# GARCH-model-to-forecast-in-excel
+I apply fundamental knowledge related to the GARCH model to make forecast the volatility of return of 10 big firms in the IT industry. In more detail, I will take the daily close price (P) of them in The Nasdaq Stock Market from (1/1/2018 – 28/02/2023 -> we will have 1298 observation) and the 10 firms include Alphabet Inc. (GOOGL), Dell Technologies Inc (DELL), Apple Inc (AAPL), Tesla Inc (TSLA), IBM (IBM), Cisco Systems Inc (CSCO), HP Inc (HPQ), Intel Corporation (INTC), Meta Platforms Inc (META), NVIDIA Corporation (NVDA). And those P are input data.<br/> 
+
+Build up GARCH (1,1) model using Maximum Likelihood to predict the volatility of return on stock prices of 10 firms. You could read the following steps to get more insight into forecasting with the GARCH model:<br/> 
 
 1. In the model, we have 03 parameters: alpha (α), beta (β), and gamma (γ). The sum of those parameters must be equal to 1. We will use those 03 parameters to compute the long-run average variance rate as the formula below: <br/> 
 $~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~$  ![image](https://github.com/LinhNguyen-MyLi/GARCH-model-to-forecast-in-excel/assets/128978862/553e4dff-e0a5-464a-9c34-7abe6931af7f) <br/>
@@ -32,7 +33,28 @@ After running the Solver, we will obtain a new set of parameters that maximize t
 We also added 03 new features: GARCH Modeled Daily Std, GARCH Modeled Annual Std Dev and Long Run Annual Std. Computing the daily Std and Annual Std is the same as in I. As for Long run annual Std, we simply take Long run annual Std in the parameter table in step 3. The table result will be like this: <br/>
 ![image](https://github.com/LinhNguyen-MyLi/GARCH-model-to-forecast-in-excel/assets/128978862/f85204ee-5c49-466b-98a2-3dcfae996d74) <br/>
 
-5. Forecased Standard Deviation over 300 days ahead
+5. Forecased Standard Deviation over 300 days ahead <br/>
+Estimating Variance by applying the formula below: <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;![image](https://github.com/LinhNguyen-MyLi/GARCH-model-to-forecast-in-excel/assets/128978862/82d41f49-1b0e-41d2-a672-e2ad45d5e13c) <br/>
+Based on the estimated variance, we estimate GARCH Modeled Daily Std by taking the square root of the estimated variance above. Then estimate sigma t (GARCH Model annual Std Dev) by multiplying the estimated GARCH Model Daily Std with the square root of 250. The sigma L (Long run annual Std) is the same. <br/>
+The estimated result will look like this (DELL): <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;![image](https://github.com/LinhNguyen-MyLi/GARCH-model-to-forecast-in-excel/assets/128978862/4e2471fa-59a7-4456-9d3d-a632242b486b) <br/>
+
+6. Find adjusted sigma n (adjusted Std n). As we observe via the chart in the step 4, the volatility of return on the stock price is fluctuated around some certain value called the long-run volatility (or long run annual Std or sigma L). The greater the volatility, the higher the risk. By calculating adjusted sigma n we know when (in the future) the volatility of the return will return to the long run annual Std. <br/>
+(Note: The higher the sum of α + β the slower the volatility of the return will return to the long run annual Std). The process to find adjusted sigma n:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - Determine the sigma n. Sigma n is the last value of the volatility of the rate of return (historical volatity data). <br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - Determine the lowest point of volatility by observing the chart or simply compute Min function excel on GARCH model annual Std. <br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - From that min value (lowest point) we calculate adjusted sigma daily by deviding it by square root of 250. <br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - Then, we power 2 the adjusted sigma daily to obtain adjusted variance. <br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - Replace adjusted variance to the last old one in σ_n^2 column.<br/>
+Before we start to adjust sigma n, we need to ganerate a Check error indicator to check when (in the future) the percentage difference between sigma t and sigma L is less than 0.5%, in other word, they start to approach each other (X point in Estimated sigma graph above). If it  > 0.5% the indicator will return 1. If it isn’t, the indicator will return 0. By using If function excel we can satisfy all those conditions.<br/>
+After compute the estimated GARCH model we fill out the table below:<br/>
+![image](https://github.com/LinhNguyen-MyLi/GARCH-model-to-forecast-in-excel/assets/128978862/95d0d304-4aec-490c-9ab6-b6edd70a8569) <br/>
+
+(Note: <br/>
+•	Time to return to sigma L (T) – is the time point before we adjust sigma n and when it start to equal to 0, we need to check the value of Check error indicator.<br/>
+•	Time to return to adjusted sigma n (Tk) – After we compute the new variance from the adjusted sigma n => we replace it into the last variance (as mentioned above). After the replacement the T will change. And the new T is Tk)
+
 
 
 
